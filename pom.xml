@@ -1,0 +1,182 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <parent>
+	<artifactId>onebusaway-nyc</artifactId>
+	<groupId>org.onebusaway</groupId>
+	<version>2.18.0-SNAPSHOT</version>
+  </parent>
+	
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>war</packaging>
+  <artifactId>onebusaway-nyc-template-webapp</artifactId>
+  <name>onebusaway-nyc-template-webapp</name>
+  <description>Empty webapp with core/post inference queue reader logic enabled</description>
+ 
+ <dependencies>
+    
+	    <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+		
+		<!-- supports core db integration -->
+	    <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.17</version>
+        </dependency>
+		
+		<!-- for configuration service impl -->
+        <dependency>
+            <groupId>org.onebusaway</groupId>
+            <artifactId>onebusaway-nyc-transit-data-federation</artifactId>
+            <version>2.15.1</version>
+            <!-- exclude JZMQ dependency -->
+	            <exclusions>
+	            	<exclusion>
+		            	<groupId>org.zeromq</groupId>
+		            	<artifactId>jzmq</artifactId>
+	            	</exclusion>
+	            </exclusions>
+        </dependency>
+        
+        <!-- Core packages that require newer dependencies for mongo, still using an older version of mongo, but it works ... -->
+        <dependency>
+             <groupId>org.slf4j</groupId>
+             <artifactId>slf4j-log4j12</artifactId>
+             <version>1.7.1</version>
+	    </dependency>
+	    
+	    <dependency>
+	        <groupId>org.slf4j</groupId>
+	        <artifactId>slf4j-api</artifactId>
+	        <version>1.7.1</version>
+      	</dependency>
+	      	
+	    <dependency>
+			<groupId>junit</groupId>     <!-- NOT org.junit here -->
+			<artifactId>junit-dep</artifactId>
+			<version>4.11</version>
+		</dependency>
+    	
+    	<dependency>
+		      <groupId>javax.servlet</groupId>
+		      <artifactId>jstl</artifactId>
+		      <version>1.2</version>
+		</dependency>
+		
+		<!-- Add ZeroMQ dependency for predictions -->
+	    <dependency>
+			<groupId>org.zeromq</groupId>
+			<artifactId>jeromq</artifactId>
+			<version>0.3.4</version>
+		</dependency>
+		
+  </dependencies>
+
+    <profiles>
+        <profile>
+            <!-- Transit data federation webapp offers the TDS -->
+            <id>cloud</id><!-- akaservices-tdf-as-tds --> <!-- aka staging, production -->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+            	<spring.version>3.0.7.RELEASE</spring.version>
+                <bundle.location>/mnt/obanyc/oba-bundle</bundle.location>
+                <bundle.mode.standalone>false</bundle.mode.standalone>
+                <tds.path>http://localhost:8080/onebusaway-nyc-transit-data-federation-webapp</tds.path>
+                <tdm.host>tdm</tdm.host>
+            </properties>
+        </profile>
+        <profile>
+            <!-- Transit data federation webapp offers the TDS -->
+            <id>cloud-qa</id>
+            <properties>
+            	<spring.version>3.0.7.RELEASE</spring.version>
+                <bundle.location>/var/lib/obanyc/oba-bundle</bundle.location>
+                <bundle.mode.standalone>false</bundle.mode.standalone>
+                <tds.path>http://localhost:8080/onebusaway-nyc-transit-data-federation-webapp</tds.path>
+                <tdm.host>tdm.qa.obanyc.com</tdm.host>
+            </properties>
+        </profile>
+        <profile>
+            <!-- Transit data federation webapp offers the TDS -->
+            <id>cloud-dev</id>
+            <properties>
+            	<spring.version>3.0.7.RELEASE</spring.version>
+                <bundle.location>/var/lib/obanyc/oba-bundle</bundle.location>
+                <bundle.mode.standalone>false</bundle.mode.standalone>
+                <tds.path>http://localhost:8080/onebusaway-nyc-transit-data-federation-webapp</tds.path>
+                <tdm.host>tdm.dev.obanyc.com</tdm.host>
+            </properties>
+        </profile>
+        <profile>
+            <!-- Transit data federation webapp offers the TDS -->
+            <id>local-single-port</id><!-- akaservices-tdf-as-tds --> <!-- aka staging, production -->
+            <properties>
+            	<spring.version>3.0.7.RELEASE</spring.version>
+                <bundle.location>/oba/oba-bundle</bundle.location>
+                <bundle.mode.standalone>false</bundle.mode.standalone>
+                <tds.path>http://localhost:8080/onebusaway-nyc-transit-data-federation-webapp</tds.path>
+                <tdm.host>tdm.dev.obanyc.com</tdm.host>
+            </properties>
+        </profile>
+        <profile>
+            <!-- Transit data federation webapp offers the TDS -->
+            <id>local-single-port-dev</id><!-- akaservices-tdf-as-tds --> <!-- aka staging, production -->
+            <properties>
+            	<spring.version>3.0.7.RELEASE</spring.version>
+                <bundle.location>/oba/oba-bundle</bundle.location>
+                <bundle.mode.standalone>false</bundle.mode.standalone>
+                <tds.path>http://localhost:8080/onebusaway-nyc-transit-data-federation-webapp</tds.path>
+                <tdm.host>tdm.dev.obanyc.com</tdm.host>
+            </properties>
+        </profile>
+    </profiles>
+    <build>
+    
+    <finalName>onebusaway-nyc-template-webapp</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+            </plugin>
+            <plugin>
+	             <groupId>pl.project13.maven</groupId>
+	             <artifactId>git-commit-id-plugin</artifactId>
+	             <version>2.1.4</version>
+	             <configuration>
+	                 <prefix>git</prefix>
+	                 <dateFormat>dd.MM.yyyy '@' HH:mm:ss z</dateFormat>
+	                 <verbose>true</verbose>
+	                 <skipPoms>false</skipPoms>
+	                 <generateGitPropertiesFile>true</generateGitPropertiesFile>
+	                 <generateGitPropertiesFilename>src/main/resources/git.properties</generateGitPropertiesFilename>
+	                 <gitDescribe>
+		                 <skip>false</skip>
+		                 <always>true</always>
+		                 <abbrev>7</abbrev>
+		                 <dirty>-dirty</dirty>
+		                 <forceLongFormat>false</forceLongFormat>
+	                 </gitDescribe>
+	             </configuration>
+	         </plugin> 
+        </plugins>
+    
+  <resources>
+    <resource>
+      <directory>src/main/resources</directory>
+      <filtering>true</filtering>
+    </resource>
+  </resources>
+  
+  </build>
+  
+  
+</project>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!--
+
+        Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+        file except in compliance with the License. You may obtain a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+        either express or implied. See the License for the specific language governing permissions and limitations under
+        the License.
+        
+        This application context imports all of the necessary components to run a Transit Data Service instance locally
+        with the predictions module
+        
+    -->
+   
+   <!DOCTYPE log4j:configuration PUBLIC
+  "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %-5p [%F:%L] : %m%n" />
+		</layout>
+	</appender>
+	
+	<logger name="org.hibernate.SQL">
+		<level value="OFF" /> <!-- DEBUG or OFF -->
+	</logger>
+	
+	<logger name="org.hibernate.type">
+		<level value="OFF" /> <!-- TRACE or OFF -->
+	</logger>
+
+	<logger name="org.springframework.remoting.support.RemoteInvocationTraceInterceptor" additivity="false">
+		<level value="error" />
+		<appender-ref ref="stdout" />
+	</logger>
+
+	<root>
+		<priority value="info" />
+		<appender-ref ref="stdout" />
+	</root>
+
+</log4j:configuration>

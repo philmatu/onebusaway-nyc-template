@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!--
+        Copyright 2013-2014 Philip Matuskiewicz / Metropolitan Transportation Agency (New York City Transit)
+        
+        Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+        file except in compliance with the License. You may obtain a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+        either express or implied. See the License for the specific language governing permissions and limitations under
+        the License.
+        
+    -->
+    
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:mvc="http://www.springframework.org/schema/mvc" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+           http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
+
+	<context:annotation-config />
+
+	<!-- Configuration Service - Needs to be loaded first so that other dependencies can grab values from this -->
+	<bean id="ConfigurationService" class="org.onebusaway.nyc.util.impl.tdm.ConfigurationServiceImpl" />
+
+	<import resource="classpath:org/onebusaway/nyc/data-sources.xml" />
+	
+	<context:annotation-config />
+	
+	<bean id="bundle" class="org.onebusaway.transit_data_federation.services.FederatedTransitDataBundle" />
+
+	<bean id="nycBundle" class="org.onebusaway.nyc.transit_data_federation.bundle.model.NycFederatedTransitDataBundle" />
+
+	<context:component-scan base-package="org.onebusaway.nyc.transit_data_federation.impl" />
+
+	<import resource="classpath:org/onebusaway/container/application-context.xml" />
+
+	<bean id="shapePointsLibrary" class="org.onebusaway.transit_data_federation.impl.shapes.ShapePointsLibrary" />
+
+	<import resource="classpath:org/onebusaway/transit_data_federation/application-context-otp.xml" />
+
+	<context:component-scan base-package="org.onebusaway.transit_data_federation.impl" />
+
+	<bean id="tripPlannerConstants" class="org.onebusaway.transit_data_federation.model.tripplanner.TripPlannerConstants" />
+	
+	<bean id="taskScheduler" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" />
+
+	<bean id="refreshServiceImpl" class="org.onebusaway.container.refresh.RefreshServiceImpl" />
+
+	<!-- Front-end web app using the local TDF will not show time predictions when disable is set to true -->
+	<!-- This should be disabled on the predictions module since we aren't hooking frontends up to the TDS here -->
+	<bean id="timeInputQueueDisable"
+		class="org.onebusaway.nyc.transit_data_federation.impl.predictions.QueuePredictionIntegrationServiceImpl">
+		<property name="disable" value="true" />
+	</bean>
+	
+	<bean id="TripDetailsValidator" class="org.onebusaway.nyc.core.impl.TripDetailsBeanValidator" />
+	
+	<bean id="PostIEQueue" class="org.onebusaway.nyc.core.impl.QueueDataFeedImpl" />
+	
+	<bean id="DummyQueueReader" class="org.onebusaway.nyc.core.receiver.DummyQueueSubscriber" />
+	
+</beans>
